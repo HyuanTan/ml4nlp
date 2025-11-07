@@ -1,0 +1,3 @@
+A1.py加入了part3；
+A1_pt3_tests.py加入了part3的sanity check并修改part1和part2的sanity check序号；
+A1_pt3_tests.sh提交运行A1_pt3_tests.py的任务

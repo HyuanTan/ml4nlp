@@ -1,0 +1,97 @@
+
+
+--- Running Sanity Checks with Dummy Data ---
+Building vocabulary from dummy_train.txt...
+Found 25 unique raw tokens.
+Truncating vocabulary to 11 most common words + 4 special tokens.
+Final vocabulary size: 15
+
+--- Part 1: Tokenization START ---
+
+--- Part 1.1: Vocabulary START ---
+[Check 1.1_1] Vocab size <= 15?
+PASS. Size is 15.
+
+[Check 1.1_2] Special symbols exist and are correct?
+PASS. Special tokens mapped: BOS:0, EOS:1, UNK:2, PAD:3.
+
+[Check 1.1_3] Frequent/Rare words included/excluded?
+PASS. Frequent words ('the', 'and', '.') are in vocab.
+PASS. Rare words ('cuboidal', 'epiglottis') are not in vocab.
+
+[Check 1.1_4] Round-trip mapping?
+PASS. In-vocab: 'the' -> 4 -> 'the'
+PASS. Out-of-vocab: 'cuboidal' -> 2 -> '<UNK>'
+
+--- Part 1.1 Checks Passed ---
+
+
+--- Part 1.2: Tokenizer Functionality START ---
+Input texts: ['This is a test.', 'Another test.']
+
+[Check 1.2_1] Tokenizer output:
+Type: <class 'transformers.tokenization_utils_base.BatchEncoding'>
+Keys: KeysView({'input_ids': tensor([[ 0,  2,  2,  9,  7,  5,  1],
+        [ 0, 11,  7,  5,  1,  3,  3]]), 'attention_mask': tensor([[1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 0, 0]])})
+
+'input_ids':
+tensor([[ 0,  2,  2,  9,  7,  5,  1],
+        [ 0, 11,  7,  5,  1,  3,  3]])
+
+'attention_mask':
+tensor([[1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 0, 0]])
+
+PASS. Output shape is torch.Size([2, 7]).
+PASS. Padding and attention mask are correct.
+PASS. Truncation to model_max_length works.
+
+[Check 1.2_2] Save and Load:
+PASS. Loaded tokenizer has same vocab size and pad ID.
+
+--- Part 1.2 Checks Passed ---
+
+--- Part 1 Checks Passed ---
+
+
+--- Part 2: Loading the text files and creating batches ---
+
+
+--- Part 2.1: Dataset Loading START ---
+Loading datasets...
+Original dataset sizes: Train=8, Val=3
+Filtering empty lines...
+
+[Check 2.1_1] Filtered dataset sizes:
+Train: 7
+Val: 2
+
+[Check 2.1_2] Subsetting dataset (optional step):
+Subset sizes: Train=2, Val=2
+PASS. Subsetting works.
+
+--- Part 2.1 Checks Passed ---
+
+
+--- Part 2.2: DataLoader START ---
+Creating DataLoader with batch_size=2...
+
+[Check 2.2_1] Fetching first batch:
+{'input_ids': tensor([[ 0,  4, 12, 13,  8, 14,  2,  4,  2,  1],
+        [ 0,  9,  7,  2, 10,  4,  6,  6,  5,  1]]), 'attention_mask': tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])}
+
+PASS. First batch fetched successfully and is a BatchEncoding with correct tensors.
+
+--- Part 2.2 Checks Passed ---
+
+--- Part 3: RNN Model START ---
+Model output shape: torch.Size([2, 6, 15])
+Loss: 2.7539806365966797
+
+ Part 3 PASS. Model forward and loss computation work.
+
+
+Cleaning up dummy files...
+Done.

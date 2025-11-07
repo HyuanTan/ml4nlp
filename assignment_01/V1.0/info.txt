@@ -1,0 +1,5 @@
+1. “A1.py”这个文件是原本skeleton来的，后面几步暂时被我comment掉了。
+2. “A1_pt2_tests.py”是同样的code但多加了他写的那些sanity checks的测试
+3. “A1_pt2_tests.sh”是在服务器里跑A1_pt2_tests.py的bash文件。这里服务器参数就只是为了我这两个part的测试的，所以没用到gpu。
+
+然后另外一点，他part1里面说的attention_mask是optional的但我做了，需要注意一下输出有attention_mask。（要是后续有问题可以删毕竟是可选的

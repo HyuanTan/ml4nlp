@@ -1,0 +1,26 @@
+
+--- Part 4: Training the model START ---
+Building vocabulary from test_data/train.txt...
+Found 7038 unique raw tokens.
+Truncating vocabulary to 496 most common words + 4 special tokens.
+Final vocabulary size: 500
+Loading full datasets for training...
+Device: cuda
+Epoch 1/5
+  Train loss: 5.4386
+  Val loss: 3.7414 | Perplexity: 42.1569
+Epoch 2/5
+  Train loss: 4.0215
+  Val loss: 3.4516 | Perplexity: 31.5496
+Epoch 3/5
+  Train loss: 3.8973
+  Val loss: 3.3641 | Perplexity: 28.9063
+Epoch 4/5
+  Train loss: 3.8199
+  Val loss: 3.3130 | Perplexity: 27.4676
+Epoch 5/5
+  Train loss: 3.7605
+  Val loss: 3.2576 | Perplexity: 25.9882
+Saving to a1_output.
+
+--- Part 4: Finish ---
