@@ -8,6 +8,7 @@ from datasets import load_dataset
 import numpy as np
 import sys, time, os, argparse
 import matplotlib.pyplot as plt
+from torch.optim.lr_scheduler import LambdaLR
 
 # check NLTK 'punkt' is available
 try:
@@ -282,11 +283,21 @@ class A1RNNModel(PreTrainedModel):
         self.embedding = nn.Embedding(
             num_embeddings=config.vocab_size, embedding_dim=config.embedding_size
         )
+
+        '''
         self.rnn = nn.GRU(
             input_size=config.embedding_size,
             hidden_size=config.hidden_size,
             batch_first=True,
         )
+        '''
+        self.rnn = nn.LSTM(
+            input_size=config.embedding_size,
+            hidden_size=config.hidden_size,
+            batch_first=True,
+        )
+        
+
         self.unembedding = nn.Linear(
             in_features=config.hidden_size, out_features=config.vocab_size
         )
@@ -354,6 +365,32 @@ def plot_training_monitor(history, output_dir, epoch=None):
         except Exception as e:
             print(f"Warning saving perplexity plot: {e}")
 
+class EarlyStopping:
+    def __init__(self, patience=3, min_delta=0.0):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.best = None
+        self.num_bad_epochs = 0
+        self.should_stop = False
+
+    def step(self, metric):
+        if self.best is None:
+            self.best = metric
+            return False
+
+        # check if metric improved
+        if metric > self.best - self.min_delta:
+            self.num_bad_epochs += 1
+        else:
+            self.best = metric
+            self.num_bad_epochs = 0
+
+        if self.num_bad_epochs >= self.patience:
+            self.should_stop = True
+            return True
+        return False
+
+
 class A1Trainer:
     """A minimal implementation similar to a Trainer from the HuggingFace library."""
 
@@ -390,6 +427,7 @@ class A1Trainer:
     def train(self):
         """Train the model."""
         args = self.args
+        num_epochs = int(args.num_train_epochs)
 
         device = self.select_device()
         print('Device:', device)
@@ -397,11 +435,9 @@ class A1Trainer:
 
         loss_func = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
 
-        # TODO: Relevant arguments: at least args.learning_rate, but you can optionally also consider
-        # other Adam-related hyperparameters here.
-        optimizer = torch.optim.AdamW(self.model.parameters(), lr=float(args.learning_rate))
+        optimizer = torch.optim.AdamW(self.model.parameters(), lr=float(args.learning_rate), weight_decay=0.01)
 
-        # TODO: Relevant arguments: args.per_device_train_batch_size, args.per_device_eval_batch_size
+
         # collate function for DataLoader: uses tokenizer to create padded tensors
         def collate_fn(batch):
             texts = [item["text"] for item in batch]
@@ -429,8 +465,29 @@ class A1Trainer:
             collate_fn=collate_fn,
             pin_memory=pin_memory,
         )
-        num_epochs = int(args.num_train_epochs)
+    
+            # recomend：5% warmup
+        warmup_ratio = 0.05
+        # total_steps = epoch * steps_per_epoch
+        total_steps = num_epochs * len(train_loader)
+        warmup_steps = int(total_steps * warmup_ratio)
+
+        def lr_lambda(current_step):
+            if current_step < warmup_steps:
+                # linear warmup: from 0 to lr
+                return float(current_step) / float(max(1, warmup_steps))
+            # warmup over, linear decay
+            return max(
+                0.0,
+                float(total_steps - current_step) / float(max(1, total_steps - warmup_steps))
+            )
+
+        scheduler = LambdaLR(optimizer, lr_lambda=lr_lambda)
+
         history = {"train_loss": [], "val_loss": [], "perplexity": []}
+
+        early_stopper = EarlyStopping(patience=3, min_delta=0.05)
+        best_model_path = os.path.join(args.output_dir, "best_model.pt")
 
         for epoch in range(num_epochs):
             self.model.train()
@@ -455,12 +512,13 @@ class A1Trainer:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+                scheduler.step()
 
                 epoch_loss += float(loss.item())
                 num_batches += 1
 
             avg_train_loss = epoch_loss / max(1, num_batches)
-            print(f"  Train loss: {avg_train_loss:.4f}")
+            print(f"Train loss: {avg_train_loss:.4f}")
             history["train_loss"].append(avg_train_loss)
 
             # Evaluation after each epoch (args.eval_strategy is assumed to be 'epoch')
@@ -488,6 +546,16 @@ class A1Trainer:
                 print(f"  Val loss: {avg_val_loss:.4f} | Perplexity: {perplexity:.4f}")
                 history["val_loss"].append(avg_val_loss)
                 history["perplexity"].append(perplexity)
+                
+                # Check early stopping
+                if early_stopper.step(avg_val_loss):
+                    print(f"Early stopping triggered at epoch {epoch+1}")
+                    break
+                # Save best model
+                if avg_val_loss == early_stopper.best:
+                    torch.save(self.model.state_dict(), best_model_path)
+                    print(f"Saved best model so far to {best_model_path}")
+
                 # update realtime plots for monitoring
                 try:
                     plot_training_monitor(history, args.output_dir, epoch+1)
@@ -763,22 +831,49 @@ if __name__ == "__main__":
 
     if enable_part4:
         # --- Part 4: Training the model ---
+
+        # parse optional CLI args for training (keeps sensible defaults)
+        parser = argparse.ArgumentParser(description="Train A1 RNN language model")
+        parser.add_argument("--use_cpu", action="store_true", help="Force use CPU")
+        parser.add_argument("--no_cuda", action="store_true", help="Disable CUDA even if available")
+        parser.add_argument("--learning_rate", type=float, default=1e-3)
+        parser.add_argument("--num_train_epochs", type=int, default=3)
+        parser.add_argument("--per_device_train_batch_size", type=int, default=64)
+        parser.add_argument("--per_device_eval_batch_size", type=int, default=64)
+        parser.add_argument("--output_dir", type=str, default="a1_output")
+        cli_args, _ = parser.parse_known_args()
+
+        # build args namespace expected by A1Trainer
+        args = argparse.Namespace(
+            optim='adamw_torch',
+            eval_strategy='epoch',
+            use_cpu=cli_args.use_cpu,
+            no_cuda=cli_args.no_cuda,
+            learning_rate=cli_args.learning_rate,
+            num_train_epochs=cli_args.num_train_epochs,
+            per_device_train_batch_size=cli_args.per_device_train_batch_size,
+            per_device_eval_batch_size=cli_args.per_device_eval_batch_size,
+            output_dir=cli_args.output_dir,
+        )
+
         print("\n--- Part 4: Training the model START ---")
         if True:
             TRAIN_FILE = "/data/courses/2025_dat450_dit247/assignments/a1/train.txt"
             VAL_FILE = "/data/courses/2025_dat450_dit247/assignments/a1/val.txt"
             MAX_VOCAB = 50000 # size for vocabulary
-            MODEL_MAX_LEN = 128 # length for sentence truncation
+            MODEL_MAX_LEN = 256 # 128 # length for sentence truncation
             TOKENIZER_FILE = "a1_tokenizer.pkl"
 
-            EMBEDDING_SIZE = 128
-            HIDDEN_SIZE = 256
+            EMBEDDING_SIZE = 256 # 128
+            HIDDEN_SIZE = 512 # 256
         else:
             TRAIN_FILE = "test_data/train.txt"
             VAL_FILE = "test_data/val.txt"
             MAX_VOCAB = 500 # size for vocabulary
             MODEL_MAX_LEN = 128 # length for sentence truncation
             TOKENIZER_FILE = "a1_tokenizer_test.pkl"
+            EMBEDDING_SIZE = 128
+            HIDDEN_SIZE = 256
 
         # tokenizer
         if not os.path.exists(TOKENIZER_FILE):
@@ -797,32 +892,6 @@ if __name__ == "__main__":
         config = A1RNNModelConfig(vocab_size=len(tokenizer), embedding_size=EMBEDDING_SIZE, hidden_size=HIDDEN_SIZE)
         model = A1RNNModel(config)
 
-        # parse optional CLI args for training (keeps sensible defaults)
-        parser = argparse.ArgumentParser(description="Train A1 RNN language model")
-        parser.add_argument("--use_cpu", action="store_true", help="Force use CPU")
-        parser.add_argument("--no_cuda", action="store_true", help="Disable CUDA even if available")
-        parser.add_argument("--learning_rate", type=float, default=1e-3)
-        parser.add_argument("--num_train_epochs", type=int, default=3)
-        parser.add_argument("--per_device_train_batch_size", type=int, default=64)
-        parser.add_argument("--per_device_eval_batch_size", type=int, default=64)
-        parser.add_argument("--output_dir", type=str, default="a1_output")
-
-        cli_args, _ = parser.parse_known_args()
-
-        # build args namespace expected by A1Trainer
-        args = argparse.Namespace(
-            optim='adamw_torch',
-            eval_strategy='epoch',
-            use_cpu=cli_args.use_cpu,
-            no_cuda=cli_args.no_cuda,
-            learning_rate=cli_args.learning_rate,
-            num_train_epochs=cli_args.num_train_epochs,
-            per_device_train_batch_size=cli_args.per_device_train_batch_size,
-            per_device_eval_batch_size=cli_args.per_device_eval_batch_size,
-            output_dir=cli_args.output_dir,
-        )
-
-        # optionally subset datasets for quick runs
         train_ds = full_dataset['train']
         val_ds = full_dataset['val']
 

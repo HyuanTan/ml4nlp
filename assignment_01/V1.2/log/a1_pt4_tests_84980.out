@@ -1,0 +1,54 @@
+
+--- Part 4: Training the model START ---
+Loading full datasets for training...
+Device: cpu
+Epoch 1/20
+Train loss: 6.0772
+  Val loss: 5.3462 | Perplexity: 209.8181
+Saved best model so far to a1_output/best_model.pt
+Epoch 2/20
+Train loss: 4.7648
+  Val loss: 3.5930 | Perplexity: 36.3420
+Saved best model so far to a1_output/best_model.pt
+Epoch 3/20
+Train loss: 3.9967
+  Val loss: 3.4768 | Perplexity: 32.3557
+Saved best model so far to a1_output/best_model.pt
+Epoch 4/20
+Train loss: 3.8899
+  Val loss: 3.3328 | Perplexity: 28.0164
+Saved best model so far to a1_output/best_model.pt
+Epoch 5/20
+Train loss: 3.7879
+  Val loss: 3.2748 | Perplexity: 26.4368
+Saved best model so far to a1_output/best_model.pt
+Epoch 6/20
+Train loss: 3.7366
+  Val loss: 3.2498 | Perplexity: 25.7854
+Epoch 7/20
+Train loss: 3.6866
+  Val loss: 3.2116 | Perplexity: 24.8191
+Saved best model so far to a1_output/best_model.pt
+Epoch 8/20
+Train loss: 3.6500
+  Val loss: 3.1797 | Perplexity: 24.0404
+Epoch 9/20
+Train loss: 3.6168
+  Val loss: 3.1634 | Perplexity: 23.6509
+Epoch 10/20
+Train loss: 3.5838
+  Val loss: 3.1496 | Perplexity: 23.3262
+Saved best model so far to a1_output/best_model.pt
+Epoch 11/20
+Train loss: 3.5603
+  Val loss: 3.1295 | Perplexity: 22.8617
+Epoch 12/20
+Train loss: 3.5350
+  Val loss: 3.1156 | Perplexity: 22.5470
+Epoch 13/20
+Train loss: 3.5135
+  Val loss: 3.1047 | Perplexity: 22.3018
+Early stopping triggered at epoch 13
+Saving to a1_output.
+
+--- Part 4: Finish ---

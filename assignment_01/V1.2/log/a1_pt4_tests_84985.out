@@ -1,0 +1,33 @@
+
+--- Part 4: Training the model START ---
+Building vocabulary from /data/courses/2025_dat450_dit247/assignments/a1/train.txt...
+Found 260725 unique raw tokens.
+Truncating vocabulary to 49996 most common words + 4 special tokens.
+Final vocabulary size: 50000
+Loading full datasets for training...
+Device: cuda
+Epoch 1/20
+Train loss: 6.2745
+  Val loss: 5.3391 | Perplexity: 208.3253
+Saved best model so far to a1_output_GRU/best_model.pt
+Epoch 2/20
+Train loss: 5.0445
+  Val loss: 4.9569 | Perplexity: 142.1475
+Saved best model so far to a1_output_GRU/best_model.pt
+Epoch 3/20
+Train loss: 4.6483
+  Val loss: 4.8454 | Perplexity: 127.1535
+Saved best model so far to a1_output_GRU/best_model.pt
+Epoch 4/20
+Train loss: 4.4180
+  Val loss: 4.8101 | Perplexity: 122.7500
+Epoch 5/20
+Train loss: 4.2518
+  Val loss: 4.8006 | Perplexity: 121.5819
+Epoch 6/20
+Train loss: 4.1232
+  Val loss: 4.8070 | Perplexity: 122.3634
+Early stopping triggered at epoch 6
+Saving to a1_output_GRU.
+
+--- Part 4: Finish ---
