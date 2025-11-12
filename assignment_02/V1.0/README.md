@@ -1,4 +1,4 @@
-# Assignment 2 - Stage 1 Implementation
+# Assignment 2 - Step 1 Implementation
 
 This document explains what was implemented for Stage 1 of Assignment 2.
 
