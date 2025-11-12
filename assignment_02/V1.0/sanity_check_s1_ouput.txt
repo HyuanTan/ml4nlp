@@ -1,0 +1,20 @@
+============================================================
+Sanity Check Tests for Stage 1 Components
+============================================================
+Testing MLP layer...
+  ✓ MLP test passed! Input shape: torch.Size([2, 10, 128]), Output shape: torch.Size([2, 10, 128])
+
+Testing RMSNorm layer...
+  ✓ RMSNorm test passed! Input shape: torch.Size([2, 10, 128]), Output shape: torch.Size([2, 10, 128])
+
+Testing MHA layer (Step 1: basic forward pass)...
+  ✓ MHA test passed! Input shape: torch.Size([2, 10, 128]), Output shape: torch.Size([2, 10, 128])
+
+Testing MHA layer with different shapes...
+  ✓ Test passed for batch_size=1, seq_len=5
+  ✓ Test passed for batch_size=4, seq_len=20
+  ✓ Test passed for batch_size=2, seq_len=1
+
+============================================================
+All sanity checks passed! ✓
+============================================================
