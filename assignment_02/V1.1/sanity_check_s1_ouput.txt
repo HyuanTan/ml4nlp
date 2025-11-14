@@ -15,6 +15,16 @@ Testing MHA layer with different shapes...
   ✓ Test passed for batch_size=4, seq_len=20
   ✓ Test passed for batch_size=2, seq_len=1
 
+Testing Transformer Decoder Layer...
+  ✓ Transformer Decoder test passed! Input shape: torch.Size([1, 5, 128]), Output shape: torch.Size([1, 5, 128])
+  ✓ Transformer Decoder test passed! Input shape: torch.Size([4, 20, 128]), Output shape: torch.Size([4, 20, 128])
+  ✓ Transformer Decoder test passed! Input shape: torch.Size([2, 1, 128]), Output shape: torch.Size([2, 1, 128])
+
+Testing Complete Transformer Stack...
+  ✓ Complete Transformer test passed! Logits shape: torch.Size([1, 5, 100])
+  ✓ Complete Transformer test passed! Logits shape: torch.Size([4, 20, 100])
+  ✓ Complete Transformer test passed! Logits shape: torch.Size([2, 1, 100])
+
 ============================================================
 All sanity checks passed! ✓
 ============================================================
