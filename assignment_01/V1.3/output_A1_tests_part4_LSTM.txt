@@ -1,0 +1,40 @@
+
+--- Part 4: Training the model START ---
+Loading full datasets for training...
+Device: cuda
+Epoch 1/20
+Train loss: 6.4432
+  Val loss: 5.5339 | Perplexity: 253.1209
+Saved best model so far to a1_output_LSTM/best_model.pt
+Epoch 2/20
+Train loss: 5.2451
+  Val loss: 5.0491 | Perplexity: 155.8776
+Saved best model so far to a1_output_LSTM/best_model.pt
+Epoch 3/20
+Train loss: 4.8264
+  Val loss: 4.8815 | Perplexity: 131.8245
+Saved best model so far to a1_output_LSTM/best_model.pt
+Epoch 4/20
+Train loss: 4.5871
+  Val loss: 4.8008 | Perplexity: 121.6134
+Saved best model so far to a1_output_LSTM/best_model.pt
+Epoch 5/20
+Train loss: 4.4185
+  Val loss: 4.7648 | Perplexity: 117.3019
+Epoch 6/20
+Train loss: 4.2887
+  Val loss: 4.7486 | Perplexity: 115.4237
+Saved best model so far to a1_output_LSTM/best_model.pt
+Epoch 7/20
+Train loss: 4.1844
+  Val loss: 4.7447 | Perplexity: 114.9711
+Epoch 8/20
+Train loss: 4.0982
+  Val loss: 4.7435 | Perplexity: 114.8314
+Epoch 9/20
+Train loss: 4.0246
+  Val loss: 4.7481 | Perplexity: 115.3680
+Early stopping triggered at epoch 9
+Saving to a1_output_LSTM.
+
+--- Part 4: Finish ---

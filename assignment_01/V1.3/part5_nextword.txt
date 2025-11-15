@@ -1,0 +1,27 @@
+Prompt: She lives in San
+Greedy next word: diego
+Top candidates:
+  1. diego (p=0.5253)
+  2. francisco (p=0.3784)
+  3. suu (p=0.0545)
+  4. salvador (p=0.0263)
+  5. jose (p=0.0155)
+
+Prompt: The capital of France is
+Greedy next word: the
+Top candidates:
+  1. the (p=0.4724)
+  2. a (p=0.2167)
+  3. located (p=0.1089)
+  4. <UNK> (p=0.1045)
+  5. home (p=0.0975)
+
+Prompt: Deep learning models are trained with
+Greedy next word: a
+Top candidates:
+  1. a (p=0.3292)
+  2. the (p=0.2798)
+  3. <UNK> (p=0.2491)
+  4. an (p=0.0784)
+  5. more (p=0.0634)
+
